@@ -33,6 +33,13 @@ def booking_data():
         "additionalneeds": "Cigars"
     }
 
-# @pytest.fixture(scope="session")
-# def get_id():
-#
+@pytest.fixture()
+def created_booking(auth_session, booking_data):
+    """Фикстура создаёт бронь и удаляет после теста
+    решил дополнить файл выносом логики создания - так как она отдаелена от сути основных проверок
+    в большинстве случаев"""
+    response = auth_session.post(f"{BASE_URL}/booking", json=booking_data)
+    booking_id = response.json()["bookingid"]
+    yield booking_id
+    # После теста — удаляем
+    auth_session.delete(f"{BASE_URL}/booking/{booking_id}")
